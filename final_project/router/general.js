@@ -5,20 +5,20 @@ let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
 public_users.post("/register", (req, res) => {
-  //Write your code here
-  const username = req.body.username;
-  const password = req.body.password;
+    //Write your code here
+    const username = req.body.username;
+    const password = req.body.password;
 
-  if (username && password) {
-      if (isValid(username)) {
-          users.push({ "username": username, "password": password })
-          return res.status(200).json({ message: `User ${username} registered successfully! Now you can log in.` })
-      }
+    if (username && password) {
+        if (!isValid(username)) {
+            users.push({ "username": username, "password": password });
 
-      return res.status(404).json({ message: `User ${username} already exists!`})
-  } else {
-      return res.status(404).json({ message: 'Unable to register user.' })
-  }
+            return res.status(200).json({ message: "User successfully registred. Now you can login" });
+        } else {
+            return res.status(404).json({ message: "User already exists!" });
+        }
+    }
+    return res.status(404).json({ message: "Unable to register user." });
 });
 
 function getBooks() {
@@ -35,15 +35,15 @@ function getBooks() {
 }
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-  getBooks()
-    .then((booksList) => {
-      res.send(JSON.stringify(booksList, null, 4));
-    })
-    .catch((error) => {
-      res.status(500).send(error.message);
-    });
+public_users.get('/', function (req, res) {
+    //Write your code here
+    getBooks()
+        .then((booksList) => {
+            res.send(JSON.stringify(booksList, null, 4));
+        })
+        .catch((error) => {
+            res.status(500).send(error.message);
+        });
 });
 
 function getBookByIsbn(isbn) {
@@ -69,9 +69,9 @@ public_users.get('/isbn/:isbn', async function (req, res) {
     try {
         const book = await getBookByIsbn(isbn);
         res.json(book);
-      } catch (error) {
+    } catch (error) {
         res.status(404).send(error.message);
-      }
+    }
 });
 
 function getBooksByAuthor(author) {
@@ -91,7 +91,7 @@ function getBooksByAuthor(author) {
         }
     });
 }
-  
+
 // Get book details based on author
 public_users.get('/author/:author', async function (req, res) {
     //Write your code here
@@ -99,9 +99,9 @@ public_users.get('/author/:author', async function (req, res) {
     try {
         const booksByAuthor = await getBooksByAuthor(author);
         res.json(booksByAuthor);
-      } catch (error) {
+    } catch (error) {
         res.status(404).send(error.message);
-      }
+    }
 });
 
 function getBookByTitle(title) {
@@ -124,21 +124,21 @@ function getBookByTitle(title) {
 
 // Get all books based on title
 public_users.get('/title/:title', async function (req, res) {
-  //Write your code here
-  const title = req.params.title;
+    //Write your code here
+    const title = req.params.title;
     try {
         const bookByTitle = await getBookByTitle(title);
         res.json(bookByTitle);
-      } catch (error) {
+    } catch (error) {
         res.status(404).send(error.message);
-      }
+    }
 });
 
 //  Get book review
-public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  const isbn = req.params.isbn
-  return res.send(books[isbn].reviews);
+public_users.get('/review/:isbn', function (req, res) {
+    //Write your code here
+    const isbn = req.params.isbn
+    return res.send(books[isbn].reviews);
 });
 
 module.exports.general = public_users;
